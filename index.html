@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PowerBank</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <main class="container">
+
+      <!-- VIEWER -->
+      <section class="viewer">
+        <div class="viewer-glow"></div>
+        <model-viewer
+          id="PowerBank"
+          src="Render/PowerBank.glb"
+          alt="PowerBank 3D"
+          camera-controls
+          disable-zoom
+          auto-rotate
+          auto-rotate-delay="1500"
+          rotation-per-second="20deg"
+          shadow-intensity="0"
+          interaction-prompt="none"
+        ></model-viewer>
+      </section>
+
+      <!-- CONTEÚDO -->
+      <section class="content">
+
+        <div class="badge-row">
+          <span class="badge">
+            <i data-lucide="zap"></i>
+            Carregamento Rápido
+          </span>
+          <span class="badge badge-outline">
+            <i data-lucide="clock"></i>
+            Disponível 24h
+          </span>
+        </div>
+
+        <h1>Energia onde<br /><span class="highlight">você precisar</span></h1>
+
+        <p class="subtitle">
+          Alugue um powerbank em segundos, carregue seu dispositivo e devolva em qualquer estação da cidade.
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="feature-icon">
+              <i data-lucide="battery-charging"></i>
+            </div>
+            <div>
+              <strong>20.000 mAh</strong>
+              <span>Carrega até 3x</span>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <i data-lucide="map-pin"></i>
+            </div>
+            <div>
+              <strong>+50 pontos</strong>
+              <span>Na cidade</span>
+            </div>
+          </div>
+          <div class="feature">
+            <div class="feature-icon">
+              <i data-lucide="shield-check"></i>
+            </div>
+            <div>
+              <strong>Sem depósito</strong>
+              <span>Pague só o uso</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="price-block">
+          <div class="price-value" id="price">R$ 8,00</div>
+          <span class="price-label">por hora</span>
+        </div>
+
+        <button id="alugarBtn" class="btn-primary">
+          <i data-lucide="zap"></i>
+          Alugar Agora
+        </button>
+
+        <!-- BOX ALUGUEL -->
+        <div class="aluguel-box" id="aluguelBox">
+          <div class="aluguel-header">
+            <i data-lucide="timer"></i>
+            <h3>Tempo de Aluguel</h3>
+          </div>
+
+          <div class="slider-wrapper">
+            <input type="range" id="tempoRange" min="2" max="8" step="1" value="2" />
+            <div class="slider-track-fill" id="sliderFill"></div>
+          </div>
+
+          <div class="labels">
+            <span>1h</span>
+            <span>1h30</span>
+            <span>2h</span>
+            <span>2h30</span>
+            <span>3h</span>
+            <span>3h30</span>
+            <span>4h</span>
+          </div>
+
+          <div class="aluguel-summary">
+            <div class="summary-item">
+              <span class="summary-label">Duração</span>
+              <span class="summary-value" id="tempoTexto">1 hora</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+              <span class="summary-label">Total</span>
+              <span class="summary-value green" id="valorTotal">R$ 8,00</span>
+            </div>
+          </div>
+
+          <button class="btn-payment" id="continuarPagamento">
+            <i data-lucide="lock"></i>
+            Continuar para Pagamento
+          </button>
+        </div>
+
+      </section>
+    </main>
+
+    <!-- SEÇÃO MAPA -->
+    <section class="map-section">
+      <div class="map-section-header">
+        <div class="map-section-text">
+          <span class="badge badge-outline">
+            <i data-lucide="map-pin"></i>
+            Pontos de Recolha
+          </span>
+          <h2>Retire e devolva <span class="highlight">onde quiser</span></h2>
+          <p>Mais de 50 estações espalhadas por São Paulo. Retire em um ponto e devolva em qualquer outro.</p>
+        </div>
+        <div class="map-section-stats">
+          <div class="stat">
+            <strong>50+</strong>
+            <span>Estações</span>
+          </div>
+          <div class="stat">
+            <strong>24h</strong>
+            <span>Disponível</span>
+          </div>
+          <div class="stat">
+            <strong>0</strong>
+            <span>Depósito</span>
+          </div>
+        </div>
+      </div>
+      <div id="mapPreview"></div>
+    </section>
+
+    <!-- MODAL -->
+    <div class="modal" id="paymentModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <div class="modal-title">
+            <i data-lucide="credit-card"></i>
+            <h2>Pagamento</h2>
+          </div>
+          <button class="close-modal" id="closeModal">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        <div class="modal-total" id="modalTotal">
+          <span>Total a pagar</span>
+          <strong id="modalValor">R$ 8,00</strong>
+        </div>
+
+        <div class="payment-selector">
+          <button class="method-btn active" id="cartaoBtn">
+            <i data-lucide="credit-card"></i>
+            Cartão
+          </button>
+          <button class="method-btn" id="pixBtn">
+            <i data-lucide="qr-code"></i>
+            PIX
+          </button>
+        </div>
+
+        <!-- CARTÃO -->
+        <div class="payment-box active" id="cartaoBox">
+          <div class="input-group">
+            <label>Nome no cartão</label>
+            <input type="text" placeholder="João Silva" />
+          </div>
+          <div class="input-group">
+            <label>Número do cartão</label>
+            <div class="input-icon">
+              <input type="text" placeholder="0000 0000 0000 0000" maxlength="19" />
+              <i data-lucide="credit-card"></i>
+            </div>
+          </div>
+          <div class="row">
+            <div class="input-group">
+              <label>Validade</label>
+              <input type="text" placeholder="MM/AA" maxlength="5" />
+            </div>
+            <div class="input-group">
+              <label>CVV</label>
+              <div class="input-icon">
+                <input type="text" placeholder="•••" maxlength="3" />
+                <i data-lucide="help-circle"></i>
+              </div>
+            </div>
+          </div>
+          <button class="pay-btn">
+            <i data-lucide="lock"></i>
+            Finalizar Pagamento
+          </button>
+        </div>
+
+        <!-- PIX -->
+        <div class="payment-box" id="pixBox">
+          <div class="qr-wrapper">
+            <div class="qr-code">
+              <div class="qr-inner">QR</div>
+            </div>
+            <p class="qr-hint">Escaneie com o app do seu banco</p>
+          </div>
+          <div class="pix-divider"><span>ou copie o código</span></div>
+          <textarea readonly id="pixCode">00020126360014BR.GOV.BCB.PIX0114PIXEXEMPLO123520400005303986540510.POWERBANK ELETRICO6009SAOPAULO62070503***6304ABCD</textarea>
+          <button class="copy-btn" id="copyPix">
+            <i data-lucide="copy"></i>
+            Copiar código PIX
+          </button>
+        </div>
+
+      <!-- TELA DE SUCESSO -->
+      <div class="modal-screen" id="successScreen">
+        <div class="success-circle">
+          <svg class="checkmark" viewBox="0 0 52 52">
+            <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark-check" fill="none" d="M14 27l8 8 16-16"/>
+          </svg>
+        </div>
+        <h2 class="success-title">Pagamento aprovado!</h2>
+        <p class="success-sub">Retire seu powerbank em um dos pontos abaixo</p>
+        <div class="success-dots">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- TELA DO MAPA -->
+      <div class="modal-screen" id="mapScreen">
+        <div class="map-header">
+          <div class="map-title-row">
+            <div class="map-icon-wrap"><i data-lucide="map-pin"></i></div>
+            <div>
+              <h3>Pontos de Recolha</h3>
+              <p>Devolva em qualquer estação próxima</p>
+            </div>
+          </div>
+          <button class="close-modal" id="closeModalMap"><i data-lucide="x"></i></button>
+        </div>
+        <div id="map"></div>
+        <div class="map-legend">
+          <span class="legend-dot"></span> Estação disponível
+          <span class="legend-count" id="legendCount">10 pontos</span>
+        </div>
+        <button class="btn-map-close" id="btnMapClose">
+          <i data-lucide="check-circle"></i>
+          Entendi, obrigado!
+        </button>
+      </div>
+
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>lucide.createIcons();</script>
+  </body>
+</html>
